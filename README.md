@@ -97,24 +97,122 @@ calls.
 
 ## Install
 
-Clone the repo:
+### Requirements
+
+- Codex CLI or Codex in the ChatGPT desktop app.
+- Node.js 22.5 or newer. Check with `node --version`.
+- Git, if installing from the repository.
+
+No `npm install` is required. The monitor uses only Node.js built-ins and does
+not need an OpenAI API key.
+
+### Install the same plugin configuration on another computer
+
+This repository uses the supported Codex compatibility layout:
+
+- `.codex-plugin/plugin.json` defines the plugin and its presentation.
+- `hooks/hooks.json` registers the lifecycle hooks.
+- `bin/` contains the hook and command entry points.
+
+Clone the complete repository into the user's Codex plugin directory. Do not
+copy your Codex session files or usage database; every installation measures
+the sessions belonging to that computer.
 
 ```bash
 git clone https://github.com/harveyxiacn/codex-usage-monitor.git ~/.codex/plugins/codex-usage-monitor
 ```
 
-Run it manually:
+To expose the `codex-usage-monitor` and `cum` commands globally, link the local
+package:
 
 ```bash
-node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js summary
-node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js statusline
-node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js watch
+cd ~/.codex/plugins/codex-usage-monitor
+npm link
 ```
 
-On Windows, use an absolute path:
+Next, expose the cloned folder through a personal marketplace and install it
+from the plugin browser. A personal marketplace file lives at
+`~/.agents/plugins/marketplace.json`. If that file already exists, add the
+following plugin object to its existing `plugins` array instead of replacing
+the file:
+
+```json
+{
+  "name": "personal-plugins",
+  "interface": {
+    "displayName": "Personal Plugins"
+  },
+  "plugins": [
+    {
+      "name": "codex-usage-monitor",
+      "source": {
+        "source": "local",
+        "path": "./.codex/plugins/codex-usage-monitor"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
+```
+
+Then restart Codex. In Codex CLI, open the plugin browser and install **Codex
+Usage Monitor** from **Personal Plugins**:
+
+```text
+codex
+/plugins
+```
+
+Review and trust the bundled hooks when prompted. Codex does not run newly
+installed non-managed hooks until the user trusts their current definitions.
+Start a new Codex session after installation.
+
+The ChatGPT desktop app can use the same personal marketplace: restart the app,
+open **Plugins**, choose **Personal Plugins**, and install **Codex Usage
+Monitor**. Plugin hooks need a local Codex execution environment; installing a
+plugin only on the web does not deploy its scripts.
+
+For background on marketplace installation and hook trust, see the
+[official OpenAI plugin packaging documentation](https://developers.openai.com/plugins/build/plugins).
+
+### Verify the installation
+
+Run the diagnostic and import existing local history once:
+
+```bash
+codex-usage-monitor doctor
+codex-usage-monitor sync --all
+codex-usage-monitor sessions
+```
+
+If you skipped `npm link`, invoke the same commands through the repository:
+
+```bash
+node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js doctor
+node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js sync --all
+node ~/.codex/plugins/codex-usage-monitor/bin/codex-usage-monitor.js sessions
+```
+
+On Windows, clone to `%USERPROFILE%\.codex\plugins\codex-usage-monitor`, run
+`npm link` from that directory, or use the absolute script path:
 
 ```powershell
-node C:\Users\YourName\.codex\plugins\codex-usage-monitor\bin\codex-usage-monitor.js summary
+node "$env:USERPROFILE\.codex\plugins\codex-usage-monitor\bin\codex-usage-monitor.js" doctor
+```
+
+### Update an installation
+
+Pull the latest version, then restart Codex so it reloads the plugin and asks
+for hook trust again if the hook definition changed:
+
+```bash
+cd ~/.codex/plugins/codex-usage-monitor
+git pull --ff-only
+npm link
 ```
 
 ## Persistent Records
@@ -139,8 +237,19 @@ The plugin includes hooks for `SessionStart`, `PostToolUse`, `Stop`,
 `Interrupt`, and `SessionEnd`. Together they create, update, and finalize
 records across supported local Codex surfaces. Hook failures never block Codex.
 
-If you install it as a Codex plugin, the hook bundle is already included.
-For a direct config install, add this to your Codex config:
+| Hook | Purpose |
+| --- | --- |
+| `SessionStart` | Creates or refreshes the session ledger record. |
+| `PostToolUse` | Periodically updates usage while Codex is working. |
+| `Stop` | Saves the latest measurements and prints the usage box. |
+| `Interrupt` | Saves state when a run is interrupted. |
+| `SessionEnd` | Finalizes the session record. |
+
+Marketplace installation automatically discovers `hooks/hooks.json`. The user
+must still review and trust the hook definitions, then start a new session.
+
+For a direct config installation that does not use the plugin browser, the
+following minimal example enables only the end-of-turn display:
 
 ```toml
 [[hooks.Stop]]
@@ -152,7 +261,39 @@ command = "node C:/Users/YourName/.codex/plugins/codex-usage-monitor/bin/on-stop
 timeout = 30
 ```
 
-Restart Codex after changing plugin or hook config.
+Replace the example path for the local operating system. This minimal setup
+does not install the other lifecycle hooks, so marketplace installation is the
+recommended way to reproduce the full configuration. Restart Codex after
+changing plugin or hook configuration.
+
+## Everyday Use
+
+After the plugin is installed and trusted, normal Codex work needs no manual
+monitor command. The hooks update the ledger automatically and print a summary
+at the configured intervals.
+
+Useful commands include:
+
+```bash
+# Current/latest session
+codex-usage-monitor summary
+codex-usage-monitor statusline
+
+# Continuously refresh in another terminal
+codex-usage-monitor watch --interval 60
+
+# Browse and aggregate saved records
+codex-usage-monitor sessions
+codex-usage-monitor totals --group-by day
+codex-usage-monitor totals --group-by project
+
+# Inspect one session from the sessions output
+codex-usage-monitor show SESSION_ID
+
+# Export report output
+codex-usage-monitor sessions --format json
+codex-usage-monitor totals --group-by model --format csv
+```
 
 ## CLI
 
