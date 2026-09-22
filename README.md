@@ -119,7 +119,7 @@ copy your Codex session files or usage database; every installation measures
 the sessions belonging to that computer.
 
 ```bash
-git clone https://github.com/harveyxiacn/codex-usage-monitor.git ~/.codex/plugins/codex-usage-monitor
+git clone https://github.com/Anish-Mndhr/codex-usage-monitor.git ~/.codex/plugins/codex-usage-monitor
 ```
 
 To expose the `codex-usage-monitor` and `cum` commands globally, link the local
@@ -237,13 +237,13 @@ The plugin includes hooks for `SessionStart`, `PostToolUse`, `Stop`,
 `Interrupt`, and `SessionEnd`. Together they create, update, and finalize
 records across supported local Codex surfaces. Hook failures never block Codex.
 
-| Hook | Purpose |
-| --- | --- |
-| `SessionStart` | Creates or refreshes the session ledger record. |
-| `PostToolUse` | Periodically updates usage while Codex is working. |
-| `Stop` | Saves the latest measurements and prints the usage box. |
-| `Interrupt` | Saves state when a run is interrupted. |
-| `SessionEnd` | Finalizes the session record. |
+| Hook           | Purpose                                                 |
+| -------------- | ------------------------------------------------------- |
+| `SessionStart` | Creates or refreshes the session ledger record.         |
+| `PostToolUse`  | Periodically updates usage while Codex is working.      |
+| `Stop`         | Saves the latest measurements and prints the usage box. |
+| `Interrupt`    | Saves state when a run is interrupted.                  |
+| `SessionEnd`   | Finalizes the session record.                           |
 
 Marketplace installation automatically discovers `hooks/hooks.json`. The user
 must still review and trust the hook definitions, then start a new session.
@@ -311,31 +311,31 @@ codex-usage-monitor doctor
 
 Options:
 
-| Option | Effect |
-| --- | --- |
-| `--file PATH` | Read a specific Codex session JSONL file. |
-| `--codex-home PATH` | Override `CODEX_HOME` / `~/.codex`. |
-| `--db PATH` | Override the SQLite database path. |
-| `--since`, `--until` | Filter records by ISO date or timestamp. |
-| `--project`, `--model` | Filter records by project path or model. |
-| `--format` | Select `table`, `json`, or `csv` report output. |
-| `--group-by` | Group totals by `day`, `project`, or `model`. |
-| `--ascii` | Use ASCII progress bars. |
-| `--no-color` | Disable ANSI color. |
+| Option                 | Effect                                          |
+| ---------------------- | ----------------------------------------------- |
+| `--file PATH`          | Read a specific Codex session JSONL file.       |
+| `--codex-home PATH`    | Override `CODEX_HOME` / `~/.codex`.             |
+| `--db PATH`            | Override the SQLite database path.              |
+| `--since`, `--until`   | Filter records by ISO date or timestamp.        |
+| `--project`, `--model` | Filter records by project path or model.        |
+| `--format`             | Select `table`, `json`, or `csv` report output. |
+| `--group-by`           | Group totals by `day`, `project`, or `model`.   |
+| `--ascii`              | Use ASCII progress bars.                        |
+| `--no-color`           | Disable ANSI color.                             |
 
 Environment variables:
 
-| Variable | Effect |
-| --- | --- |
-| `CODEX_USAGE_MONITOR_ASCII=1` | Use ASCII bars in all output. |
-| `CODEX_USAGE_MONITOR_NO_COLOR=1` | Disable ANSI colors. |
-| `CODEX_USAGE_MONITOR_QUIET=1` | Silence the Stop-hook summary box. |
-| `CODEX_USAGE_MONITOR_HOOK_INTERVAL_SECONDS=N` | Show the Stop-hook box at most once every `N` seconds. Unset means every turn. |
+| Variable                                      | Effect                                                                           |
+| --------------------------------------------- | -------------------------------------------------------------------------------- |
+| `CODEX_USAGE_MONITOR_ASCII=1`                 | Use ASCII bars in all output.                                                    |
+| `CODEX_USAGE_MONITOR_NO_COLOR=1`              | Disable ANSI colors.                                                             |
+| `CODEX_USAGE_MONITOR_QUIET=1`                 | Silence the Stop-hook summary box.                                               |
+| `CODEX_USAGE_MONITOR_HOOK_INTERVAL_SECONDS=N` | Show the Stop-hook box at most once every `N` seconds. Unset means every turn.   |
 | `CODEX_USAGE_MONITOR_WORK_INTERVAL_SECONDS=N` | Show the work-in-progress hook box at most once every `N` seconds. Default: 300. |
-| `CODEX_USAGE_MONITOR_DIRECT_TTY=0` | Disable direct terminal writes from hooks. |
-| `CODEX_USAGE_MONITOR_MAX_BYTES=N` | Skip transcript files larger than `N` bytes. Default: 50 MB. |
-| `CODEX_USAGE_MONITOR_DB=PATH` | Override the persistent database path. |
-| `CODEX_USAGE_MONITOR_CONFIG=PATH` | Override the pricing configuration path. |
+| `CODEX_USAGE_MONITOR_DIRECT_TTY=0`            | Disable direct terminal writes from hooks.                                       |
+| `CODEX_USAGE_MONITOR_MAX_BYTES=N`             | Skip transcript files larger than `N` bytes. Default: 50 MB.                     |
+| `CODEX_USAGE_MONITOR_DB=PATH`                 | Override the persistent database path.                                           |
+| `CODEX_USAGE_MONITOR_CONFIG=PATH`             | Override the pricing configuration path.                                         |
 
 ## Pricing Notes
 
@@ -394,6 +394,9 @@ The suite covers:
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
 # codex-usage-monitor
+
 # codex-usage-monitor
+
 # codex-usage-monitor
