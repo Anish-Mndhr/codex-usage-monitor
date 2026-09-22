@@ -37,6 +37,8 @@ Relevant record types:
 
 The parser keeps the latest thread and per-turn snapshots while summing response
 deltas into model buckets. Older transcripts fall back to `token_count`.
+Timestamped usage deltas are also retained as derived ledger records so local-day
+totals remain accurate when a session is resumed on a later date.
 SQLite writes replace derived child records transactionally, making ingestion
 idempotent.
 
@@ -84,8 +86,9 @@ unknown models make cost incomplete instead of silently free.
 
 SQLite uses WAL mode and a busy timeout for simultaneous Codex surfaces.
 `sessions` stores durable aggregates, `turns` retains audit detail,
-`session_models` supports model grouping, and `ingestion_files` avoids parsing
-unchanged transcripts. Transcript text is never copied into the ledger.
+`session_models` supports model grouping, `usage_records` supports local-day
+aggregation, and `ingestion_files` avoids parsing unchanged transcripts.
+Transcript text is never copied into the ledger.
 
 ## Failure Modes
 

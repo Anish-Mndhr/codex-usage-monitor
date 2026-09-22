@@ -23,6 +23,8 @@ Stop-hook box after a Codex turn:
 | Context    ctx #----------- 12% (1.2k/10k)                    |
 | This turn  turn in 1.2k out 200 reason 110                    |
 | Session    2.2k in  300 out  2 turns  cache 40.9%             |
+| Session today  2.2k in  300 out  2 turns  API≈$0.0080         |
+| All today      5.8k in  720 out  5 turns  3 sessions API≈$0.021 |
 | Models     GPT-5.5 $0.0066  |  GPT-5.4 mini $0.0014          |
 | Cost       API≈$0.0080                                       |
 +---------------------------------------------------------------+
@@ -42,6 +44,7 @@ Stop-hook box after a Codex turn:
 - Shows Codex primary and secondary rolling limits when present.
 - Estimates API-equivalent cost from versioned OpenAI prices with custom overrides.
 - Breaks cost down by model when a session uses multiple models.
+- Shows today's tokens and cost for the current session and across all sessions.
 - Provides live summaries plus `sync`, `sessions`, `show`, `totals`, and exports.
 - Uses only Node.js built-ins and makes no runtime network requests.
 - Keeps all data local. No telemetry, no network calls at runtime.
@@ -294,6 +297,11 @@ codex-usage-monitor show SESSION_ID
 codex-usage-monitor sessions --format json
 codex-usage-monitor totals --group-by model --format csv
 ```
+
+The table form of `sessions` starts with an isolated all-session Today total,
+then adapts its history columns to the terminal width. Session IDs may be
+shortened in narrow terminals; the displayed unique prefix can be passed to
+`codex-usage-monitor show`.
 
 ## CLI
 

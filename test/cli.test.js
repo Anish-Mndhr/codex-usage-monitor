@@ -46,6 +46,19 @@ test('statusline command prints a compact one-line summary', () => {
   assert.match(result.stdout.trim(), /API≈\$0\.0080/);
 });
 
+test('default summary adds separate session-today and all-today usage rows', () => {
+  const codexHome = tempCodexHome();
+  seedLatestSession(codexHome);
+  const result = spawnSync(process.execPath, [cli, '--codex-home', codexHome, '--ascii', '--no-color'], {
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Session today/);
+  assert.match(result.stdout, /All today/);
+  assert.match(result.stdout, /Cost\s+API≈/);
+});
+
 test('json command emits machine-readable usage summary', () => {
   const result = spawnSync(process.execPath, [cli, 'json', '--file', fixture], {
     encoding: 'utf8',
@@ -56,6 +69,7 @@ test('json command emits machine-readable usage summary', () => {
   assert.equal(payload.sessionId, 'sess_basic');
   assert.equal(payload.model, 'gpt-5.4-mini');
   assert.equal(payload.totalUsage.totalTokens, 2500);
+  assert.equal(Object.hasOwn(payload, 'usageRecords'), false);
 });
 
 test('help command documents watch interval and hook throttle', () => {
@@ -186,4 +200,46 @@ test('sessions and totals commands persist and query records', () => {
   const totals = spawnSync(process.execPath, [cli, 'totals', '--codex-home', codexHome, '--format', 'json'], { encoding: 'utf8' });
   assert.equal(totals.status, 0, totals.stderr);
   assert.equal(JSON.parse(totals.stdout)[0].sessions, 1);
+});
+
+test('sessions table isolates today and fits narrow terminals', () => {
+  const codexHome = tempCodexHome();
+  seedLatestSession(codexHome);
+  const result = spawnSync(process.execPath, [cli, 'sessions', '--codex-home', codexHome], {
+    encoding: 'utf8',
+    env: { ...process.env, COLUMNS: '80' },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /^Today \(\d{4}-\d{2}-\d{2}\)/);
+  assert.match(result.stdout, /\nSessions\n/);
+  assert.match(result.stdout, /output/);
+  assert.match(result.stdout, /cost/);
+  assert.match(result.stdout, /status/);
+  for (const line of result.stdout.trimEnd().split('\n')) assert.ok(line.length <= 80, line);
+});
+
+test('sessions JSON remains machine-readable without the human Today block', () => {
+  const codexHome = tempCodexHome();
+  seedLatestSession(codexHome);
+  const result = spawnSync(process.execPath, [cli, 'sessions', '--codex-home', codexHome, '--format', 'json'], {
+    encoding: 'utf8',
+    env: { ...process.env, COLUMNS: '60' },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload[0].session_id, 'sess_basic');
+  assert.doesNotMatch(result.stdout, /^Today/);
+});
+
+test('show accepts an unambiguous displayed session prefix', () => {
+  const codexHome = tempCodexHome();
+  seedLatestSession(codexHome);
+  const result = spawnSync(process.execPath, [cli, 'show', 'sess_ba', '--codex-home', codexHome, '--format', 'json'], {
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).session_id, 'sess_basic');
 });

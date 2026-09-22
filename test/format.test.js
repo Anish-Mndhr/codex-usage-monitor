@@ -46,6 +46,16 @@ const summary = {
       { modelId: 'gpt-5.4-mini', name: 'GPT-5.4 mini', usd: 0.000565 },
     ],
   },
+  sessionTodayUsage: {
+    date: '2026-09-22', sessionCount: 1, turnCount: 2,
+    usage: { inputTokens: 2100, outputTokens: 190 },
+    cost: { usd: 0.014, complete: true },
+  },
+  allTodayUsage: {
+    date: '2026-09-22', sessionCount: 3, turnCount: 14,
+    usage: { inputTokens: 18400, outputTokens: 1600 },
+    cost: { usd: 0.121, complete: true },
+  },
 };
 
 test('formatTokens and formatUsd keep compact human-friendly units', () => {
@@ -83,6 +93,8 @@ test('formatStopBox renders a bordered multi-line summary', () => {
   assert.match(box, /Context/);
   assert.match(box, /This turn/);
   assert.match(box, /Session/);
+  assert.match(box, /Session today\s+2\.1k in\s+190 out\s+2 turns\s+API≈\$0\.014/);
+  assert.match(box, /All today\s+18\.4k in\s+1\.6k out\s+14 turns\s+3 sessions\s+API≈\$0\.121/);
   assert.match(box, /Models/);
   assert.match(box, /Cost/);
 });

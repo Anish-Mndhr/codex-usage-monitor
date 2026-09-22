@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add separate local-day token and cost totals for the current session and all sessions.
+- Add a responsive sessions table with an isolated Today total and usable ID prefixes.
+
 ## 0.2.0 - 2026-09-22
 
 - Add a persistent SQLite ledger with session, turn, and per-model records.

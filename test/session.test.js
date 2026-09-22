@@ -35,6 +35,10 @@ test('summarizeSessionFile extracts Codex usage, model, effort, context, limits,
   assert.equal(summary.cost.complete, true);
   assert.equal(summary.cost.perModel.length, 2);
   assert.ok(summary.cost.usd > 0);
+  assert.equal(summary.usageRecords.length, 2);
+  assert.equal(summary.usageRecords[0].turnId, 'turn_one');
+  assert.equal(summary.usageRecords[1].turnId, 'turn_two');
+  assert.ok(summary.usageRecords.every((record) => record.costStatus === 'estimated'));
 });
 
 test('summarizeSessionFile returns null for missing files', async () => {
@@ -57,4 +61,6 @@ test('current token_usage_record snapshots produce idempotent turn totals', asyn
   assert.equal(summary.models['gpt-5.6-sol'].inputTokens, 220);
   assert.equal(summary.models['gpt-5.6-sol'].costUsd, summary.cost.usd);
   assert.equal(summary.cost.complete, true);
+  assert.equal(summary.usageRecords.length, 2);
+  assert.equal(summary.usageRecords.reduce((sum, record) => sum + record.usage.inputTokens, 0), 220);
 });
