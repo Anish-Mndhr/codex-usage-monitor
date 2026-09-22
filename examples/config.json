@@ -1,0 +1,17 @@
+{
+  "pricing": {
+    "aliases": {
+      "my-azure-deployment": "gpt-5.6-sol"
+    },
+    "models": {
+      "private-deployment": {
+        "name": "Private deployment",
+        "source": "azure-contract",
+        "input": 4,
+        "cachedInput": 0.4,
+        "cacheWriteInput": 5,
+        "output": 20
+      }
+    }
+  }
+}

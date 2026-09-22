@@ -1,0 +1,19 @@
+{
+  "name": "codex-usage-monitor",
+  "version": "0.2.0+codex.20260922040635",
+  "description": "Persist and report token usage and estimated cost across local Codex sessions.",
+  "author": {
+    "name": "harveyxiacn"
+  },
+  "interface": {
+    "displayName": "Codex Usage Monitor",
+    "shortDescription": "Persistent token and cost records for Codex.",
+    "longDescription": "Tracks every local Codex session in SQLite and reports input, cached input, cache writes, output, reasoning tokens, and configurable cost estimates.",
+    "developerName": "harveyxiacn",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": "Show my saved Codex usage records and estimated cost."
+  }
+}

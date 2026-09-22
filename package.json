@@ -1,0 +1,50 @@
+{
+  "name": "codex-usage-monitor",
+  "version": "0.2.0",
+  "description": "Codex CLI plugin and local monitor for usage, model, reasoning effort, context, cache hits, and API-equivalent cost",
+  "main": "bin/codex-usage-monitor.js",
+  "bin": {
+    "codex-usage-monitor": "bin/codex-usage-monitor.js",
+    "cum": "bin/codex-usage-monitor.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "smoke:statusline": "node bin/codex-usage-monitor.js statusline --file test/fixtures/session-basic.jsonl",
+    "smoke:summary": "node bin/codex-usage-monitor.js summary --file test/fixtures/session-basic.jsonl"
+  },
+  "keywords": [
+    "codex",
+    "codex-cli",
+    "plugin",
+    "hooks",
+    "usage",
+    "tokens",
+    "pricing",
+    "cache"
+  ],
+  "author": "harveyxiacn (https://github.com/harveyxiacn)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harveyxiacn/codex-usage-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/harveyxiacn/codex-usage-monitor/issues"
+  },
+  "homepage": "https://github.com/harveyxiacn/codex-usage-monitor#readme",
+  "files": [
+    ".codex-plugin/",
+    "bin/",
+    "docs/",
+    "examples/",
+    "hooks/",
+    "lib/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
+}
