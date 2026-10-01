@@ -49,6 +49,28 @@ Stop-hook box after a Codex turn:
 - Uses only Node.js built-ins and makes no runtime network requests.
 - Keeps all data local. No telemetry, no network calls at runtime.
 
+### GPT-6.1 Sol cost estimates
+
+GPT-6.1 Sol is supported using Standard API-equivalent USD prices per million
+tokens, verified October 1, 2026:
+
+| Token category | Up to 272K request input | Above 272K request input |
+| --- | ---: | ---: |
+| Input | $2.00 | $4.00 |
+| Cached input | $0.10 | $0.20 |
+| Cache writes | $2.50 | $5.00 |
+| Output | $10.00 | $15.00 |
+
+The long-context tier applies to the full request, not cumulative session
+input. Reasoning tokens are included in output and are not charged twice.
+`API≈` is an API-equivalent estimate, not a subscription bill. Fast mode costs
+twice Standard, but local transcripts do not reliably identify the mode, so
+the monitor assumes Standard. Deployment pricing overrides remain supported.
+Available transcripts are reimported once after this pricing update; records
+without a remaining transcript are retained with their existing estimates.
+
+Source: [official OpenAI pricing](https://developers.openai.com/api/docs/models/gpt-6.1-sol).
+
 ## Recommended Usage
 
 ### After Each Codex Turn

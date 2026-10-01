@@ -91,3 +91,38 @@ test('SQLite sync is idempotent and retains session and turn records', async () 
     assert.ok(allDay.cost.usd < 1);
   } finally { db.close(); }
 });
+
+test('pricing update reimports unchanged GPT-6.1 Sol history once without duplicating records', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-usage-reprice-'));
+  const sessionDir = path.join(root, 'sessions');
+  fs.mkdirSync(sessionDir);
+  const file = path.join(sessionDir, 'sol.jsonl');
+  fs.writeFileSync(file, [
+    { type: 'session_meta', payload: { id: 'sol-history' } },
+    { type: 'turn_context', payload: { turn_id: 'turn-1', model: 'gpt-6.1-sol' } },
+    { timestamp: '2026-10-01T00:00:00Z', type: 'token_usage_record', payload: {
+      session_id: 'sol-history', turn_id: 'turn-1',
+      usage: { input_tokens: 1000, output_tokens: 100 },
+    } },
+  ].map(JSON.stringify).join('\n'));
+  const databasePath = path.join(root, 'usage.sqlite3');
+  await syncSessions({ codexHome: root, databasePath });
+  const db = openDatabase(databasePath);
+  try {
+    db.exec("UPDATE ingestion_files SET ingestion_version = 2;");
+    db.exec("UPDATE sessions SET cost_usd = 0, cost_status = 'partial';");
+    db.exec("INSERT INTO sessions (session_id, status, ingested_at) VALUES ('retained', 'archived', '2026-09-01');");
+    assert.equal((await syncSessions({ codexHome: root, db })).imported, 1);
+    assert.equal((await syncSessions({ codexHome: root, db })).skipped, 1);
+    const record = getSession(db, 'sol-history');
+    assert.equal(record.cost_usd, 0.003);
+    assert.equal(record.cost_status, 'estimated');
+    assert.equal(record.turns.length, 1);
+    assert.equal(record.models.length, 1);
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM usage_records').get().n, 1);
+    assert.ok(getSession(db, 'retained'));
+    const today = queryTodayUsage(db, { now: new Date('2026-10-01T12:00:00Z') });
+    assert.equal(today.cost.usd, 0.003);
+    assert.equal(today.cost.complete, true);
+  } finally { db.close(); }
+});

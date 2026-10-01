@@ -64,3 +64,27 @@ test('current token_usage_record snapshots produce idempotent turn totals', asyn
   assert.equal(summary.usageRecords.length, 2);
   assert.equal(summary.usageRecords.reduce((sum, record) => sum + record.usage.inputTokens, 0), 220);
 });
+
+test('GPT-6.1 Sol prices individual short requests when cumulative turn input exceeds 272K', async () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'codex-usage-sol-')), 'sol.jsonl');
+  const records = [
+    { type: 'session_meta', payload: { id: 'sol' } },
+    { type: 'turn_context', payload: { turn_id: 'turn-1', model: 'gpt-6.1-sol' } },
+    ...[1, 2].map((n) => ({
+      type: 'token_usage_record', payload: {
+        session_id: 'sol', turn_id: 'turn-1',
+        usage: { input_tokens: 200_000, output_tokens: 1000 },
+        turn_token_usage: { input_tokens: n * 200_000, output_tokens: n * 1000 },
+        thread_token_usage: { input_tokens: n * 200_000, output_tokens: n * 1000 },
+      },
+    })),
+  ];
+  fs.writeFileSync(file, records.map(JSON.stringify).join('\n'));
+  const summary = await summarizeSessionFile(file);
+  assert.equal(summary.modelName, 'GPT-6.1 Sol');
+  assert.equal(summary.totalUsage.inputTokens, 400_000);
+  assert.equal(summary.cost.complete, true);
+  assert.equal(summary.cost.usd, 0.82);
+  assert.equal(summary.turns[0].costUsd, 0.82);
+  assert.equal(summary.usageRecords.length, 2);
+});

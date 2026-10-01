@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add GPT-6.1 Sol Standard pricing, including cache writes and long-context rates.
+- Recalculate available history after the pricing update and preserve unknown costs.
+- Apply long-context pricing only above 272,000 request input tokens.
 - Add separate local-day token and cost totals for the current session and all sessions.
 - Add a responsive sessions table with an isolated Today total and usable ID prefixes.
 
